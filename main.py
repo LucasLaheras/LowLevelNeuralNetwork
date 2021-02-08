@@ -19,6 +19,6 @@ model = Sequential([
     layers.Layer_Dense(64, 3)
 ])
 
-model.compile(optimizer=Optimizer_adagrad(decay=1e-4), loss=Activation_Softmax_Loss_CategoricalCrossentropy())
+model.compile(optimizer=Optimizer_RMSprop(learning_rate=0.02, decay=1e-4, rho=0.999), loss=Activation_Softmax_Loss_CategoricalCrossentropy())
 
 model.fit(X, y, 10000)
