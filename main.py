@@ -19,6 +19,6 @@ model = Sequential([
     layers.Layer_Dense(64, 3)
 ])
 
-model.compile(optimizer=Optimizer_stochastic_gradient_descent(decay=1e-3), loss=Activation_Softmax_Loss_CategoricalCrossentropy())
+model.compile(optimizer=Optimizer_stochastic_gradient_descent(decay=1e-4, momentum=0.95), loss=Activation_Softmax_Loss_CategoricalCrossentropy())
 
 model.fit(X, y, 10000)
