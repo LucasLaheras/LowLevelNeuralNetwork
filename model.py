@@ -41,15 +41,21 @@ class Sequential:
             loss = self.loss_activation.forward(self.sequence[len(self.sequence)-1].output, y)
             predictions = np.argmax(self.loss_activation.output, axis=1)
 
-            accuracy = np.mean(predictions==y)
+            accuracy = np.mean(predictions == y)
 
             if not epoch % step:
-                print(f'epoch: {epoch}/{epochs} - loss: {loss} - accuracy: {accuracy}')
+                print(f'epoch: {epoch}/{epochs} - loss: {loss} - accuracy: {accuracy} - learning rate: {self.optimizer.current_learning_rate}')
+
+            self.optimizer.decay_ajustment()
 
             self.loss_activation.backward(self.loss_activation.output, y)
             gradient_inputs = self.loss_activation.gradient_inputs
+
             for i in reversed(range(len(self.sequence))):
                 self.sequence[i].backward(gradient_inputs)
                 gradient_inputs = self.sequence[i].gradient_inputs
+
                 if isinstance(self.sequence[i], Layer_Dense):
                     self.optimizer.update_parameters(self.sequence[i])
+
+            self.optimizer.increment_iteration()

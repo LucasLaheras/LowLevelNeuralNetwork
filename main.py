@@ -4,6 +4,8 @@ import activation_function
 from model import Sequential
 import nnfs
 from nnfs import datasets
+from optimizer import *
+from activation_function import *
 
 nnfs.init()
 
@@ -17,6 +19,6 @@ model = Sequential([
     layers.Layer_Dense(64, 3)
 ])
 
-model.compile()
+model.compile(optimizer=Optimizer_stochastic_gradient_descent(decay=1e-3), loss=Activation_Softmax_Loss_CategoricalCrossentropy())
 
 model.fit(X, y, 10000)
