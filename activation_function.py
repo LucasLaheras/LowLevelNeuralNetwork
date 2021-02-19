@@ -1,12 +1,16 @@
 import numpy as np
 from loss import *
 
-class Activation_softmax:
+
+class Activation:
     def __init__(self):
         self.inputs = None
         self.output = None
+        self.gradient_inputs = None
 
-    def forward(self, inputs):
+
+class Activation_softmax(Activation):
+    def forward(self, inputs, training):
         self.inputs = inputs
         exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
         normalized_values = exp_values / np.sum(exp_values, axis=1, keepdims=True)
@@ -23,13 +27,12 @@ class Activation_softmax:
 
             self.gradient_inputs[index] = np.dot(jacobian_matrix, single_derivate)
 
+    def prediction(self, outputs):
+        return np.argmax(outputs, axis=1)
 
-class Activation_ReLU:
-    def __init__(self):
-        self.inputs = None
-        self.output = None
 
-    def forward(self, inputs):
+class Activation_ReLU(Activation):
+    def forward(self, inputs, training):
         self.inputs = inputs
         self.output = np.maximum(0, inputs)
 
@@ -38,9 +41,35 @@ class Activation_ReLU:
 
         self.gradient_inputs[self.inputs < 0] = 0
 
+    def prediction(self, outputs):
+        return outputs
+
+
+class Activation_Sigmoid(Activation):
+    def forward(self, inputs, training):
+        self.inputs = inputs
+        self.output = 1 / (1 + np.exp(-inputs))
+
+    def backward(self, gradient):
+        self.gradient_inputs = gradient * (1 - self.output) * self.output
+
+    def prediction(self, outputs):
+        return (outputs > 0.5) * 1
+
+
+class Activation_Linear:
+    def forward(self, inputs, training):
+        self.inputs = inputs
+        self.output = inputs
+
+    def backward(self, gradient):
+        self.gradient_inputs = gradient.copy()
+
+    def prediction(self, outputs):
+        return outputs
+
 
 class Activation_Softmax_Loss_CategoricalCrossentropy():
-
     def __init__(self):
         self.output = None
         self.gradient_inputs = None

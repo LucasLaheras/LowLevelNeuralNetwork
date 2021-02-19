@@ -1,13 +1,45 @@
 import numpy as np
 
 
-def book_chapter_5(softmax_outputs, class_targets):
-    # Calculate values along second axis (axis of index 1)
-    predictions = np.argmax(softmax_outputs, axis=1)
-    # If targets are one-hot encoded - convert them
-    if len(class_targets.shape) == 2:
-        class_targets = np.argmax(class_targets, axis=1)
-    # True evaluates to 1; False to 0
-    accuracy = np.mean(predictions == class_targets)
+class Accuracy:
+    def new_pass(self):
+        self.accumulated_sum = 0
+        self.accumulated_count = 0
 
-    return accuracy
+    def calculate(self, predictions, y):
+        comparisons = self.compare(predictions, y)
+
+        accuracy = np.mean(comparisons)
+
+        self.accumulated_sum += np.sum(comparisons)
+        self.accumulated_count += len(comparisons)
+
+        return accuracy
+
+    def calculate_accumulated(self):
+        accuracy = self.accumulated_sum / self.accumulated_count
+
+        return accuracy
+
+
+class Accuracy_Regression(Accuracy):
+    def __init__(self):
+        self.precision = None
+
+    def init(self, y, reinit=False):
+        if self.precision is None or reinit:
+            self.precision = np.std(y) / 250
+
+    def compare(self, predictions, y):
+        return np.absolute(predictions - y) < self.precision
+
+
+class Accuracy_Categorical(Accuracy):
+
+    def init(self, y):
+        pass
+
+    def compare(self, predictions, y):
+        if len(y.shape) == 2:
+            y = np.argmax(y, axis=1)
+        return predictions == y
